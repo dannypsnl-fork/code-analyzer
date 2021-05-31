@@ -6,6 +6,6 @@
 @title{code-analyzer}
 @author{Lîm Tsú-thuàn}
 
-@defmodule[code-analyzer]
+The purpose of this package is maintaining a reliable service that responsing **definitions**, **errors** to clients.
 
-Package Description Here
+Clients of this package can be like language-server or some advanced static analyzer.
