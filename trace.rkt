@@ -90,13 +90,13 @@
       void)
 
     (define/override (syncheck:add-jump-to-definition
-                      _text pos-left pos-right id filename submods)
+                      text pos-left pos-right id filename submods)
       (interval-map-set! references pos-left pos-right
                          (reference filename id))
       void)
 
     (define/override (syncheck:add-definition-target
-                      _text pos-left pos-right id mods)
+                      text pos-left pos-right id mods)
       (hash-set! definitions id '(pos-left . pos-right))
       void)
 
