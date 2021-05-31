@@ -138,26 +138,28 @@
                            (string->symbol type)))
       void)
 
+    (define/public (check-syntax)
+      (define ns (make-base-namespace))
+
+      (parameterize ([current-annotations this])
+        (define-values (expanded-expression expansion-completed)
+          (make-traversal ns src))
+        (define port (open-input-file src))
+        (port-count-lines! port)
+        (parameterize ([current-namespace ns])
+          (with-handlers ([exn? (report-error this)])
+            (expanded-expression
+             (expand
+              (with-module-reading-parameterization
+                (lambda ()
+                  (read-syntax src port)))))))
+        (expansion-completed))
+      this)
+
     (super-new)))
 
 (define ((report-error trace) exn)
   (send trace add-error (exn->exception exn)))
 
-(define (check-syntax path)
-  (define ns (make-base-namespace))
-  (define trace (new build-trace% [src path]))
-
-  (parameterize ([current-annotations trace])
-    (define-values (expanded-expression expansion-completed)
-      (make-traversal ns path))
-    (define port (open-input-file path))
-    (port-count-lines! port)
-    (parameterize ([current-namespace ns])
-      (with-handlers ([exn? (report-error trace)])
-        (expanded-expression
-         (expand
-          (with-module-reading-parameterization
-            (lambda ()
-              (read-syntax path port)))))))
-    (expansion-completed))
-  trace)
+(define (make-tracer path)
+  (new build-trace% [src path]))

@@ -7,7 +7,8 @@
   (command-line
     #:program "code-analyzer"
     #:args (file)
-    (define tr (check-syntax file))
+    (define tr (make-tracer file))
+    (send tr check-syntax)
     (displayln (send tr get-errors))
     (displayln (send tr get-require-locations))
     ))
