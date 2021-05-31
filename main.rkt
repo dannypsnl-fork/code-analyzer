@@ -1,14 +1,21 @@
 #lang racket
 
-(module+ main
-  (require racket/cmdline
-           "trace.rkt")
+(provide pos
+         find-definition)
 
-  (command-line
-    #:program "code-analyzer"
-    #:args (file)
-    (define tr (make-tracer file))
-    (send tr check-syntax)
-    (displayln (send tr get-errors))
-    (displayln (send tr get-require-locations))
-    ))
+(require "trace.rkt")
+
+(define (find-definition path id)
+  (define tr (new-tracer path))
+  (send tr check-syntax)
+  (send tr get-definition id)
+  )
+
+(define tracer (make-hash))
+
+(define (new-tracer path)
+  (if (hash-has-key? tracer path)
+      (hash-ref tracer path)
+      (let ([tr (make-tracer path)])
+        (hash-set! tracer path tr)
+        tr)))

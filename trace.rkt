@@ -9,6 +9,8 @@
          drracket/check-syntax
          syntax/modread)
 
+(struct pos (start end) #:transparent)
+
 (struct exception (code msg srclocs) #:transparent)
 (struct warning (code msg srclocs) #:transparent)
 (struct binding (start end require?) #:transparent)
@@ -36,6 +38,9 @@
     (define require-locations empty)
     (define documentation empty)
     (define tails (make-hasheq))
+
+    (define/public (get-definition id)
+      (hash-ref definitions id))
 
     ;; Getters
     (define/public (get-errors) errors)
@@ -96,8 +101,8 @@
       void)
 
     (define/override (syncheck:add-definition-target
-                      text pos-left pos-right id mods)
-      (hash-set! definitions id '(pos-left . pos-right))
+                      text start end id mods)
+      (hash-set! definitions id (pos start end))
       void)
 
     (define/override (syncheck:add-require-open-menu
