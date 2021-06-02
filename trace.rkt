@@ -4,6 +4,7 @@
 
 (require racket/class
          racket/list
+         racket/set
          racket/match
          data/interval-map
          drracket/check-syntax
@@ -168,3 +169,29 @@
 
 (define (make-tracer path)
   (new build-trace% [src path]))
+
+(define (add-completion-word m start end val)
+  (define c (mutable-set val))
+  (define s (interval-map-ref m start #f))
+  (when s
+    (set-union! c s))
+  (define e (interval-map-ref m end #f))
+  (when e
+    (set-union! c e))
+  (interval-map-set! m start end
+                     c))
+
+(module+ test
+  (require rackunit)
+
+  (test-case "contribute completion"
+             (define m (make-interval-map))
+             (add-completion-word m 0 10 'a)
+             (add-completion-word m 0 12 'b)
+             (add-completion-word m 0 6 'c)
+             (check-equal? (interval-map-ref m 7)
+                           (mutable-set 'a 'b))
+             (check-equal? (interval-map-ref m 0)
+                           (mutable-set 'a 'b 'c))
+             (check-equal? (interval-map-ref m 11)
+                           (mutable-set 'a 'b))))
