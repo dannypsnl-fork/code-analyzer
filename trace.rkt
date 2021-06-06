@@ -44,7 +44,7 @@
     (define/public (get-definition id)
       (hash-ref definitions id))
     (define/public (get-completions pos)
-      completions)
+      (append completions (interval-map-ref bindings pos '())))
 
     ;; Getters
     (define/public (get-errors) errors)
@@ -83,15 +83,15 @@
       void)
 
     (define/override (syncheck:add-arrow/name-dup/pxpy
-                      _start-text start-pos-left start-pos-right start-px start-py
-                      _end-text end-pos-left end-pos-right end-px end-py
+                      start-text start-pos-left start-pos-right start-px start-py
+                      end-text end-pos-left end-pos-right end-px end-py
                       actual? level require-arrow? name-dup?)
-      (interval-map-set! bindings end-pos-left end-pos-right
-                         (binding start-pos-left start-pos-right require-arrow?))
+      (add-completion-word! bindings end-pos-left end-pos-right
+                            (binding start-pos-left start-pos-right require-arrow?))
       void)
 
     (define/override (syncheck:add-mouse-over-status
-                      _text pos-left pos-right hover-content)
+                      text pos-left pos-right hover-content)
       (interval-map-set! hovers pos-left pos-right hover-content)
       void)
 
@@ -174,7 +174,7 @@
 (define (make-tracer path)
   (new build-trace% [src path]))
 
-(define (add-completion-word m start end val)
+(define (add-completion-word! m start end val)
   (define c (mutable-set val))
   (define s (interval-map-ref m start #f))
   (when s
@@ -190,9 +190,9 @@
 
   (test-case "contribute completion"
              (define m (make-interval-map))
-             (add-completion-word m 0 10 'a)
-             (add-completion-word m 0 12 'b)
-             (add-completion-word m 0 6 'c)
+             (add-completion-word! m 0 10 'a)
+             (add-completion-word! m 0 12 'b)
+             (add-completion-word! m 0 6 'c)
              (check-equal? (interval-map-ref m 7)
                            (mutable-set 'a 'b))
              (check-equal? (interval-map-ref m 0)
