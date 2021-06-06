@@ -1,15 +1,20 @@
 #lang racket
 
 (provide pos
-         find-definition)
+         find-definition
+         completions)
 
 (require "trace.rkt")
 
 (define (find-definition path id)
   (define tr (new-tracer path))
   (send tr check-syntax)
-  (send tr get-definition id)
-  )
+  (send tr get-definition id))
+
+(define (completions path pos)
+  (define tr (new-tracer path))
+  (send tr check-syntax)
+  (send tr get-completions pos))
 
 (define tracer (make-hash))
 

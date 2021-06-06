@@ -39,9 +39,12 @@
     (define require-locations empty)
     (define documentation empty)
     (define tails (make-hasheq))
+    (define completions empty)
 
     (define/public (get-definition id)
       (hash-ref definitions id))
+    (define/public (get-completions pos)
+      completions)
 
     ;; Getters
     (define/public (get-errors) errors)
