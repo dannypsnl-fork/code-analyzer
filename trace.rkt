@@ -126,12 +126,12 @@
       void)
 
     (define/override (syncheck:add-prefixed-require-reference
-                      _req-src req-pos-left req-pos-right)
+                      req-src req-pos-left req-pos-right)
       ;; Required to avoid arity error.
       void)
 
     (define/override (syncheck:add-unused-require
-                      _req-src req-pos-left req-pos-right)
+                      req-src req-pos-left req-pos-right)
       (add-warning
        (warning "warn:unused-require" "Unused require."
                 ;; line and column unknown
@@ -140,7 +140,7 @@
                          (- req-pos-right req-pos-left)))))
       void)
 
-    (define/override (syncheck:color-range _text start end style-name)
+    (define/override (syncheck:color-range text start end style-name)
       (define type (substring style-name 22))
       (when (not (equal? type "unused-require"))
         (interval-map-set! semantic-coloring (add1 start) (add1 end)
@@ -163,6 +163,7 @@
                 (lambda ()
                   (read-syntax src port)))))))
         (expansion-completed))
+
       this)
 
     (super-new)))
