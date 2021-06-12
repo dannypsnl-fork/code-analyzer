@@ -87,7 +87,6 @@
                       start-text start-pos-left start-pos-right start-px start-py
                       end-text end-pos-left end-pos-right end-px end-py
                       actual? level require-arrow? name-dup?)
-      (displayln (list end-pos-left end-pos-right))
       (add-completion-word! bindings end-pos-left end-pos-right
                             (binding start-pos-left start-pos-right require-arrow?)))
 
