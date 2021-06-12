@@ -18,7 +18,7 @@
 (struct link (start end text file) #:transparent)
 
 (define (exn->exception e)
-  (match-define-values (struct-type _) (struct-info e))
+  (define-values (struct-type _) (struct-info e))
   (match-define-values (code _ _ _ _ _ _ _) (struct-type-info struct-type))
   (define msg (exn-message e))
   (define srclocs (if (exn:srclocs? e) ((exn:srclocs-accessor e) e) '()))
