@@ -9,9 +9,9 @@
            "../main.rkt")
 
   (check-equal? (find-definition "get-def1.rkt" 'x)
-                (binding 27 28 #f))
+                (binding 27 28 "get-def1.rkt"))
   (check-equal? (find-definition "get-def1.rkt" 'y)
-                (binding 40 41 #f))
+                (binding 40 41 "get-def1.rkt"))
   (check-equal? (find-definition "get-def1.rkt" 'z)
-                (binding 53 54 #f))
+                (binding 53 54 "get-def1.rkt"))
   )
