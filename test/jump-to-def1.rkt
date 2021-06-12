@@ -9,5 +9,5 @@
            "../main.rkt")
 
   (check-equal? (jump-to "jump-to-def1.rkt" 40)
-                (mutable-set (binding 35 36 #f)))
+                (binding 35 36 #f))
   )

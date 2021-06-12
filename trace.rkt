@@ -87,8 +87,8 @@
                       start-text start-pos-left start-pos-right start-px start-py
                       end-text end-pos-left end-pos-right end-px end-py
                       actual? level require-arrow? name-dup?)
-      (add-completion-word! bindings end-pos-left end-pos-right
-                            (binding start-pos-left start-pos-right require-arrow?)))
+      (interval-map-set! bindings end-pos-left end-pos-right
+                         (binding start-pos-left start-pos-right require-arrow?)))
 
     (define/override (syncheck:add-mouse-over-status
                       text pos-left pos-right hover-content)
