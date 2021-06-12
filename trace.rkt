@@ -7,8 +7,7 @@
          racket/set
          racket/match
          data/interval-map
-         drracket/check-syntax
-         syntax/modread)
+         drracket/check-syntax)
 
 (struct pos (start end) #:transparent)
 
@@ -45,6 +44,8 @@
       (hash-ref definitions id))
     (define/public (get-completions pos)
       (append completions (interval-map-ref bindings pos '())))
+    (define/public (jump-to pos)
+      (interval-map-ref bindings pos))
 
     ;; Getters
     (define/public (get-errors) errors)
@@ -146,25 +147,6 @@
         (interval-map-set! semantic-coloring (add1 start) (add1 end)
                            (string->symbol type)))
       void)
-
-    (define/public (check-syntax)
-      (define ns (make-base-namespace))
-
-      (parameterize ([current-annotations this])
-        (define-values (expanded-expression expansion-completed)
-          (make-traversal ns src))
-        (define port (open-input-file src))
-        (port-count-lines! port)
-        (parameterize ([current-namespace ns])
-          (with-handlers ([exn? (report-error this)])
-            (expanded-expression
-             (expand
-              (with-module-reading-parameterization
-                (lambda ()
-                  (read-syntax src port)))))))
-        (expansion-completed))
-
-      this)
 
     (super-new)))
 
