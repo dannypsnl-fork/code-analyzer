@@ -87,28 +87,25 @@
                       start-text start-pos-left start-pos-right start-px start-py
                       end-text end-pos-left end-pos-right end-px end-py
                       actual? level require-arrow? name-dup?)
+      (displayln (list end-pos-left end-pos-right))
       (add-completion-word! bindings end-pos-left end-pos-right
-                            (binding start-pos-left start-pos-right require-arrow?))
-      void)
+                            (binding start-pos-left start-pos-right require-arrow?)))
 
     (define/override (syncheck:add-mouse-over-status
                       text pos-left pos-right hover-content)
-      (interval-map-set! hovers pos-left pos-right hover-content)
-      void)
+      (interval-map-set! hovers pos-left pos-right hover-content))
 
     (define/override (syncheck:add-text-type _text pos-left pos-right text-type)
-      void)
+      (void))
 
     (define/override (syncheck:add-jump-to-definition
                       text pos-left pos-right id filename submods)
       (interval-map-set! references pos-left pos-right
-                         (reference filename id))
-      void)
+                         (reference filename id)))
 
     (define/override (syncheck:add-definition-target
                       text start end id mods)
-      (hash-set! definitions id (pos start end))
-      void)
+      (hash-set! definitions id (pos start end)))
 
     (define/override (syncheck:add-require-open-menu
                       text start-pos end-pos file)
@@ -116,20 +113,18 @@
             (cons (link start-pos end-pos
                         text
                         (string-append "file://" (path->string file)))
-                  require-locations))
-      void)
+                  require-locations)))
 
     (define/override (syncheck:add-docs-menu
                       text start-pos end-pos key the-label path
                       definition-tag tag)
       (define doc-uri (format "file://~a#~a" path tag))
-      (set! documentation (cons (link start-pos end-pos text doc-uri) documentation))
-      void)
+      (set! documentation (cons (link start-pos end-pos text doc-uri) documentation)))
 
     (define/override (syncheck:add-prefixed-require-reference
                       req-src req-pos-left req-pos-right)
       ;; Required to avoid arity error.
-      void)
+      (void))
 
     (define/override (syncheck:add-unused-require
                       req-src req-pos-left req-pos-right)
@@ -138,15 +133,13 @@
                 ;; line and column unknown
                 (list
                  (srcloc src #f #f req-pos-left
-                         (- req-pos-right req-pos-left)))))
-      void)
+                         (- req-pos-right req-pos-left))))))
 
     (define/override (syncheck:color-range text start end style-name)
       (define type (substring style-name 22))
       (when (not (equal? type "unused-require"))
         (interval-map-set! semantic-coloring (add1 start) (add1 end)
-                           (string->symbol type)))
-      void)
+                           (string->symbol type))))
 
     (super-new)))
 
@@ -156,15 +149,15 @@
 (define (make-tracer path)
   (new build-trace% [src path]))
 
-(define (add-completion-word! m start end val)
+(define (add-completion-word! map start end val)
   (define c (mutable-set val))
-  (define s (interval-map-ref m start #f))
+  (define s (interval-map-ref map start #f))
   (when s
     (set-union! c s))
-  (define e (interval-map-ref m end #f))
+  (define e (interval-map-ref map end #f))
   (when e
     (set-union! c e))
-  (interval-map-set! m start end
+  (interval-map-set! map start end
                      c))
 
 (module+ test
