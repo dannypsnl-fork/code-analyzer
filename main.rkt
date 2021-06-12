@@ -121,9 +121,6 @@
                       actual? level require-arrow? name-dup?)
       (if require-arrow?
           (let ()
-            (displayln (list end-pos-left end-pos-right
-                             (syntax->datum start-text)
-                             (syntax->datum end-text)))
             (define from-path (syntax->datum start-text))
             (interval-map-set! bindings end-pos-left end-pos-right
                                (find-definition from-path (syntax->datum end-text))))
