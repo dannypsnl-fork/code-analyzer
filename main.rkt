@@ -1,6 +1,6 @@
 #lang racket
 
-(provide pos
+(provide binding
          find-definition
          completions
          jump-to)

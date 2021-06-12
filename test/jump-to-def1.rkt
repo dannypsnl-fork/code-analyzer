@@ -5,7 +5,6 @@
 
 (module+ test
   (require rackunit
-           "../trace.rkt"
            "../main.rkt")
 
   (check-equal? (jump-to "jump-to-def1.rkt" 40)

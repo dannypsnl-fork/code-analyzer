@@ -9,8 +9,6 @@
          data/interval-map
          drracket/check-syntax)
 
-(struct pos (start end) #:transparent)
-
 (struct exception (code msg srclocs) #:transparent)
 (struct warning (code msg srclocs) #:transparent)
 (struct binding (start end require?) #:transparent)
@@ -104,7 +102,7 @@
 
     (define/override (syncheck:add-definition-target
                       text start end id mods)
-      (hash-set! definitions id (pos start end)))
+      (hash-set! definitions id (binding start end #f)))
 
     (define/override (syncheck:add-require-open-menu
                       text start-pos end-pos file)
