@@ -9,5 +9,5 @@ foo foo
            "../main.rkt")
 
   (check-equal? (get-references "get-references1.rkt" 'foo)
-                (mutable-set (binding 30 33 "get-references1.rkt")
-                             (binding 34 37 "get-references1.rkt"))))
+                (mutable-set (binding 'foo 30 33 "get-references1.rkt")
+                             (binding 'foo 34 37 "get-references1.rkt"))))

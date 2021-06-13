@@ -1,11 +1,15 @@
 #lang racket
 
-(provide binding
+(provide (struct-out binding)
          init-check
+         get-definitions
          find-definition
          completions
          jump-to-definition
-         get-references)
+         get-references
+         ; pos->lspposion
+         binding->Range
+         Pos->pos)
 
 (require racket/class
          racket/list
@@ -20,25 +24,35 @@
   (define tr (new-tracer path))
   (check-syntax tr path))
 
-(define (find-definition path id [convert? #f])
+(define (get-definitions path [pos->lsppos? #f])
+  (define tr (new-tracer path))
+  (check-syntax tr path)
+  (send tr get-definitions))
+
+(define (find-definition path id [pos->lsppos? #f])
   (define tr (new-tracer path))
   (check-syntax tr path)
   (define r (send tr get-definition id))
-  (if convert?
+  (if pos->lsppos?
       (binding->Range tr r)
       r))
 
-(define (jump-to-definition path from [convert? #f])
+(define (jump-to-definition path from [pos->lsppos? #f])
   (define tr (new-tracer path))
   (check-syntax tr path)
   (define r (send tr jump-to-def from))
-  (if convert?
+  (if pos->lsppos?
       (binding->Range tr r)
       r))
 
-(define (binding->Range tr r)
-  (match-define (binding start end _) r)
-  (send tr convert start end))
+(define (binding->Range path r)
+  (define tr (new-tracer path))
+  (match-define (binding _ start end _) r)
+  (send tr pos->lsppos start end))
+
+(define (Pos->pos path pos)
+  (define tr (new-tracer path))
+  (send tr lsppos->pos pos))
 
 (define (completions path pos)
   (define tr (new-tracer path))
@@ -99,8 +113,10 @@
     (define tails (make-hasheq))
     (define completions empty)
 
+    (define/public (get-definitions)
+      (hash-values definitions))
     (define/public (get-definition id)
-      (hash-ref definitions id))
+      (hash-ref definitions id #f))
     (define/public (get-completions pos)
       (append completions (interval-map-ref bindings pos '())))
     (define/public (jump-to-def pos)
@@ -108,8 +124,10 @@
     (define/public (get-references id)
       (hash-ref references (send this get-definition id) #f))
 
-    (define/public (convert start end)
+    (define/public (pos->lsppos start end)
       (start/end->Range doc-text start end))
+    (define/public (lsppos->pos pos)
+      (Pos->abs-pos doc-text pos))
 
     ;; Getters
     (define/public (get-errors) errors)
@@ -151,11 +169,11 @@
         (if require-arrow?
             (let ([from-path (syntax->datum start-text)])
               (find-definition from-path (syntax->datum end-text)))
-            (binding start-pos-left start-pos-right src)))
+            (binding (syntax->datum start-text) start-pos-left start-pos-right src)))
       (interval-map-set! bindings end-pos-left end-pos-right
                          loc)
       (add-reference! references loc
-                      (binding end-pos-left end-pos-right src)))
+                      (binding (syntax->datum end-text) end-pos-left end-pos-right src)))
 
     (define/override (syncheck:add-mouse-over-status
                       text pos-left pos-right hover-content)
@@ -170,7 +188,7 @@
 
     (define/override (syncheck:add-definition-target
                       text start end id mods)
-      (hash-set! definitions id (binding start end src)))
+      (hash-set! definitions id (binding (syntax->datum text) start end src)))
 
     (define/override (syncheck:add-require-open-menu
                       text start-pos end-pos file)

@@ -9,7 +9,7 @@
 
 (struct exception (code msg srclocs) #:transparent)
 (struct warning (code msg srclocs) #:transparent)
-(struct binding (start end require-from) #:transparent)
+(struct binding (name start end require-from) #:transparent)
 (struct reference (filename id) #:transparent)
 (struct link (start end text file) #:transparent)
 
