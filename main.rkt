@@ -159,15 +159,16 @@
                       start-text start-pos-left start-pos-right start-px start-py
                       end-text end-pos-left end-pos-right end-px end-py
                       actual? level require-arrow? name-dup?)
+      (define id (syntax->datum end-text))
       (define loc
         (if require-arrow?
             (let ([from-path (syntax->datum start-text)])
-              (find-definition from-path (syntax->datum end-text)))
-            (binding (syntax->datum start-text) start-pos-left start-pos-right src)))
+              (find-definition from-path id))
+            (binding id start-pos-left start-pos-right src)))
       (interval-map-set! bindings end-pos-left end-pos-right
                          loc)
       (add-reference! references loc
-                      (binding (syntax->datum end-text) end-pos-left end-pos-right src)))
+                      (binding id end-pos-left end-pos-right src)))
 
     (define/override (syncheck:add-mouse-over-status
                       text pos-left pos-right hover-content)
@@ -182,7 +183,7 @@
 
     (define/override (syncheck:add-definition-target
                       text start end id mods)
-      (hash-set! definitions id (binding (syntax->datum text) start end src)))
+      (hash-set! definitions id (binding id start end src)))
 
     (define/override (syncheck:add-require-open-menu
                       text start-pos end-pos file)
