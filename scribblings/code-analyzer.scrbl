@@ -6,6 +6,6 @@
 @title{code-analyzer}
 @author{Lîm Tsú-thuàn}
 
-The purpose of this package is maintaining a reliable service that responsing **definitions**, **errors** to clients.
+The purpose of this package is maintaining a reliable service that responsing @bold{definitions}, @bold{errors} to clients.
 
 Clients of this package can be like language-server or some advanced static analyzer.
