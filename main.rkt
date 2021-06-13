@@ -24,26 +24,20 @@
   (define tr (new-tracer path))
   (check-syntax tr path))
 
-(define (get-definitions path [pos->lsppos? #f])
+(define (get-definitions path)
   (define tr (new-tracer path))
   (check-syntax tr path)
   (send tr get-definitions))
 
-(define (find-definition path id [pos->lsppos? #f])
+(define (find-definition path id)
   (define tr (new-tracer path))
   (check-syntax tr path)
-  (define r (send tr get-definition id))
-  (if pos->lsppos?
-      (binding->Range tr r)
-      r))
+  (send tr get-definition id))
 
-(define (jump-to-definition path from [pos->lsppos? #f])
+(define (jump-to-definition path from)
   (define tr (new-tracer path))
   (check-syntax tr path)
-  (define r (send tr jump-to-def from))
-  (if pos->lsppos?
-      (binding->Range tr r)
-      r))
+  (send tr jump-to-def from))
 
 (define (binding->Range path r)
   (define tr (new-tracer path))
