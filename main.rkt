@@ -1,6 +1,7 @@
 #lang racket
 
 (provide binding
+         init-check
          find-definition
          completions
          jump-to-definition
@@ -12,6 +13,10 @@
          syntax/modread
          drracket/check-syntax
          "helper.rkt")
+
+(define (init-check path)
+  (define tr (new-tracer path))
+  (check-syntax tr path))
 
 (define (find-definition path id)
   (define tr (new-tracer path))
