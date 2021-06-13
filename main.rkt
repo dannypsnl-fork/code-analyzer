@@ -119,13 +119,13 @@
                       start-text start-pos-left start-pos-right start-px start-py
                       end-text end-pos-left end-pos-right end-px end-py
                       actual? level require-arrow? name-dup?)
-      (if require-arrow?
-          (let ()
-            (define from-path (syntax->datum start-text))
-            (interval-map-set! bindings end-pos-left end-pos-right
-                               (find-definition from-path (syntax->datum end-text))))
-          (interval-map-set! bindings end-pos-left end-pos-right
-                             (binding start-pos-left start-pos-right src))))
+      (define loc
+        (if require-arrow?
+            (let ([from-path (syntax->datum start-text)])
+              (find-definition from-path (syntax->datum end-text)))
+            (binding start-pos-left start-pos-right src)))
+      (interval-map-set! bindings end-pos-left end-pos-right
+                         loc))
 
     (define/override (syncheck:add-mouse-over-status
                       text pos-left pos-right hover-content)
