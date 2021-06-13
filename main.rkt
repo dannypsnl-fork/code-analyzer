@@ -12,21 +12,33 @@
          data/interval-map
          syntax/modread
          drracket/check-syntax
-         "helper.rkt")
+         framework
+         "helper.rkt"
+         "lsp-pos.rkt")
 
 (define (init-check path)
   (define tr (new-tracer path))
   (check-syntax tr path))
 
-(define (find-definition path id)
+(define (find-definition path id [convert? #f])
   (define tr (new-tracer path))
   (check-syntax tr path)
-  (send tr get-definition id))
+  (define r (send tr get-definition id))
+  (if convert?
+      (binding->Range tr r)
+      r))
 
-(define (jump-to-definition path from)
+(define (jump-to-definition path from [convert? #f])
   (define tr (new-tracer path))
   (check-syntax tr path)
-  (send tr jump-to-def from))
+  (define r (send tr jump-to-def from))
+  (if convert?
+      (binding->Range tr r)
+      r))
+
+(define (binding->Range tr r)
+  (match-define (binding start end _) r)
+  (send tr convert start end))
 
 (define (completions path pos)
   (define tr (new-tracer path))
@@ -65,11 +77,15 @@
         tr)))
 
 (define (make-tracer path)
-  (new build-trace% [src path]))
+  (define doc-text (new racket:text%))
+  (send doc-text insert (port->string (open-input-file path)) 0)
+  (new build-trace%
+       [src path]
+       [doc-text doc-text]))
 
 (define build-trace%
   (class (annotations-mixin object%)
-    (init-field src)
+    (init-field src doc-text)
 
     (define errors empty)
     (define warnings empty)
@@ -91,6 +107,9 @@
       (interval-map-ref bindings pos #f))
     (define/public (get-references id)
       (hash-ref references (send this get-definition id) #f))
+
+    (define/public (convert start end)
+      (start/end->Range doc-text start end))
 
     ;; Getters
     (define/public (get-errors) errors)
