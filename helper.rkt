@@ -34,6 +34,12 @@
   (interval-map-set! map start end
                      c))
 
+(define (add-reference! map loc reference)
+  (define c (mutable-set reference))
+  (when (hash-ref map loc #f)
+    (set-union! c (hash-ref map loc)))
+  (hash-set! map loc c))
+
 (module+ test
   (require rackunit)
 

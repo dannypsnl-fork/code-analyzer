@@ -3,7 +3,8 @@
 (provide binding
          find-definition
          completions
-         jump-to-definition)
+         jump-to-definition
+         get-references)
 
 (require racket/class
          racket/list
@@ -26,6 +27,11 @@
   (define tr (new-tracer path))
   (check-syntax tr path)
   (send tr get-completions pos))
+
+(define (get-references path id)
+  (define tr (new-tracer path))
+  (check-syntax tr path)
+  (send tr get-references id))
 
 (define (check-syntax tracer path)
   (define ns (make-base-namespace))
@@ -66,7 +72,7 @@
     (define hovers (make-interval-map))
     (define bindings (make-interval-map))
     (define definitions (make-hasheq))
-    (define references (make-interval-map))
+    (define references (make-hash))
     (define require-locations empty)
     (define documentation empty)
     (define tails (make-hasheq))
@@ -78,6 +84,8 @@
       (append completions (interval-map-ref bindings pos '())))
     (define/public (jump-to-def pos)
       (interval-map-ref bindings pos))
+    (define/public (get-references id)
+      (hash-ref references (send this get-definition id)))
 
     ;; Getters
     (define/public (get-errors) errors)
@@ -87,10 +95,6 @@
     (define/public (get-hovers) hovers)
     ;; Bindings to locations in current file.
     (define/public (get-bindings) bindings)
-    ;; Definitions are things that can be referenced.
-    (define/public (get-definitions) definitions)
-    ;; References locations in other files.
-    (define/public (get-references) references)
     ;; References a file.
     (define/public (get-require-locations) require-locations)
     (define/public (get-documentation) documentation)
@@ -125,7 +129,9 @@
               (find-definition from-path (syntax->datum end-text)))
             (binding start-pos-left start-pos-right src)))
       (interval-map-set! bindings end-pos-left end-pos-right
-                         loc))
+                         loc)
+      (add-reference! references loc
+                      (binding end-pos-left end-pos-right src)))
 
     (define/override (syncheck:add-mouse-over-status
                       text pos-left pos-right hover-content)
@@ -136,8 +142,7 @@
 
     (define/override (syncheck:add-jump-to-definition
                       text pos-left pos-right id filename submods)
-      (interval-map-set! references pos-left pos-right
-                         (reference filename id)))
+      (void))
 
     (define/override (syncheck:add-definition-target
                       text start end id mods)
