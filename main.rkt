@@ -83,9 +83,9 @@
     (define/public (get-completions pos)
       (append completions (interval-map-ref bindings pos '())))
     (define/public (jump-to-def pos)
-      (interval-map-ref bindings pos))
+      (interval-map-ref bindings pos #f))
     (define/public (get-references id)
-      (hash-ref references (send this get-definition id)))
+      (hash-ref references (send this get-definition id) #f))
 
     ;; Getters
     (define/public (get-errors) errors)
