@@ -11,6 +11,7 @@
 (struct warning (code msg srclocs) #:transparent)
 (struct binding (name start end require-from) #:transparent)
 (struct reference (filename id) #:transparent)
+(struct link (start end text file) #:transparent)
 
 (define (exn->exception e)
   (define-values (struct-type _) (struct-info e))

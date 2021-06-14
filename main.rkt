@@ -1,6 +1,7 @@
 #lang racket
 
 (provide (struct-out binding)
+         (struct-out link)
          init-check
          get-definitions
          find-definition
@@ -194,15 +195,15 @@
     (define/override (syncheck:add-require-open-menu
                       text start-pos end-pos file)
       (set! require-locations
-            (cons (binding text start-pos end-pos
-                           (string-append "file://" (path->string file)))
+            (cons (link start-pos end-pos text
+                        (string-append "file://" (path->string file)))
                   require-locations)))
 
     (define/override (syncheck:add-docs-menu
                       text start-pos end-pos key the-label path
                       definition-tag tag)
       (define doc-uri (format "file://~a#~a" path tag))
-      (set! documentation (cons (binding (syntax->datum text) start-pos end-pos doc-uri) documentation)))
+      (set! documentation (cons (link start-pos end-pos (syntax->datum text) doc-uri) documentation)))
 
     (define/override (syncheck:add-prefixed-require-reference
                       req-src req-pos-left req-pos-right)

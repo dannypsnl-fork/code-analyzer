@@ -7,5 +7,5 @@
            "../main.rkt")
 
   (check-equal? (get-documentation "get-document1.rkt")
-                (list (binding 'define 20 26
-                               "file:///Applications/Racket v8.1/doc/reference/define.html#(form._((lib._racket/private/base..rkt)._define))"))))
+                (list (link 20 26 'define
+                            "file:///Applications/Racket v8.1/doc/reference/define.html#(form._((lib._racket/private/base..rkt)._define))"))))
