@@ -7,6 +7,7 @@
          completions
          jump-to-definition
          get-references
+         get-documentation
          ; pos->lspposion
          binding->Range
          Pos->pos)
@@ -39,15 +40,6 @@
   (check-syntax tr path)
   (send tr jump-to-def from))
 
-(define (binding->Range path r)
-  (define tr (new-tracer path))
-  (match-define (binding _ start end _) r)
-  (send tr pos->lsppos start end))
-
-(define (Pos->pos path pos)
-  (define tr (new-tracer path))
-  (send tr lsppos->pos pos))
-
 (define (completions path pos)
   (define tr (new-tracer path))
   (check-syntax tr path)
@@ -57,6 +49,20 @@
   (define tr (new-tracer path))
   (check-syntax tr path)
   (send tr get-references id))
+
+(define (get-documentation path)
+  (define tr (new-tracer path))
+  (check-syntax tr path)
+  (send tr get-documentation))
+
+(define (binding->Range path r)
+  (define tr (new-tracer path))
+  (match-define (binding _ start end _) r)
+  (send tr pos->lsppos start end))
+
+(define (Pos->pos path pos)
+  (define tr (new-tracer path))
+  (send tr lsppos->pos pos))
 
 (define (check-syntax tracer path)
   (define ns (make-base-namespace))
@@ -188,16 +194,15 @@
     (define/override (syncheck:add-require-open-menu
                       text start-pos end-pos file)
       (set! require-locations
-            (cons (link start-pos end-pos
-                        text
-                        (string-append "file://" (path->string file)))
+            (cons (binding text start-pos end-pos
+                           (string-append "file://" (path->string file)))
                   require-locations)))
 
     (define/override (syncheck:add-docs-menu
                       text start-pos end-pos key the-label path
                       definition-tag tag)
       (define doc-uri (format "file://~a#~a" path tag))
-      (set! documentation (cons (link start-pos end-pos text doc-uri) documentation)))
+      (set! documentation (cons (binding (syntax->datum text) start-pos end-pos doc-uri) documentation)))
 
     (define/override (syncheck:add-prefixed-require-reference
                       req-src req-pos-left req-pos-right)
