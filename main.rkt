@@ -162,9 +162,9 @@
       (hash-set! tails from-pos to-pos)
       void)
 
-    (define/override (syncheck:add-arrow/name-dup/pxpy
-                      start-text start-pos-left start-pos-right start-px start-py
-                      end-text end-pos-left end-pos-right end-px end-py
+    (define/override (syncheck:add-arrow/name-dup
+                      start-text start-pos-left start-pos-right
+                      end-text end-pos-left end-pos-right
                       actual? level require-arrow? name-dup?)
       (define id (syntax->datum end-text))
       (define loc
